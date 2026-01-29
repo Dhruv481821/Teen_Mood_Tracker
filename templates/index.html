@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CalmConnect - Mental Health Support</title>
+    <link rel="stylesheet" href="/mentalHealthTracker/static/style.css">
+
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon">🌿</div>
+                <h1>CalmConnect</h1>
+            </div>
+            <p class="subtitle">A safe space to talk about mental health and find support</p>
+        </header>
+
+        <div class="disclaimer">
+            <strong>Important:</strong> This is a simulated chat for demonstration. If you're in crisis, please contact a mental health professional or crisis helpline.
+        </div>
+
+        <div class="chat-container" id="chat-container">
+            <div class="message bot-message">
+                Hi there! I'm here to provide support and information about mental health. How are you feeling today?
+            </div>
+            <div class="typing-indicator" id="typing-indicator">
+                <span class="typing-dot"></span>
+                <span class="typing-dot"></span>
+                <span class="typing-dot"></span>
+            </div>
+        </div>
+
+        <div class="quick-replies">
+            <button class="quick-reply" data-reply="I've been feeling anxious">I'm anxious</button>
+            <button class="quick-reply" data-reply="I've been feeling down">I'm feeling down</button>
+            <button class="quick-reply" data-reply="I need someone to talk to">Need to talk</button>
+            <button class="quick-reply" data-reply="What resources are available?">Resources</button>
+        </div>
+
+        <div class="input-area">
+            <input type="text" id="user-input" placeholder="Type your message here...">
+            <button id="send-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
+        </div>
+
+        <div class="resources">
+            <h2>Mental Health Resources</h2>
+            <div class="resource-list">
+                <div class="resource">
+                    <h3>Crisis Text Line</h3>
+                    <p>The child helpline number in India is 1098. This is a 24-hour, free emergency service for children in need of aid and assistance.</p>
+                    <a href="#" target="_blank">Visit Website</a>
+                </div>
+                <div class="resource">
+                    <h3>National Suicide Prevention Lifeline</h3>
+                    <p>You can call us for free on 0800 328 4444. If you need urgent help or are in a crisis or emotional distress.</p>
+                    <a href="#" target="_blank">Visit Website</a>
+                </div>
+                <div class="resource">
+                    <h3>Teen Line</h3>
+                    <p>All-in-One Emergency 112 Centralized helpline for Police, Ambulance, Fire Anytime.</p>
+                    <a href="#" target="_blank">Visit Website</a>
+                </div>
+                <div class="resource">
+                    <h3>Mindfulness for Teens</h3>
+                    <p>Resources and tools to help teens use mindfulness to handle stress.</p>
+                    <a href="#" target="_blank">Visit Website</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>CalmConnect 2025 | "Your Everyday Path To Calm And Focus"</p>
+    </footer>
+
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const chatContainer = document.getElementById('chat-container');
+    const userInput = document.getElementById('user-input');
+    const sendBtn = document.getElementById('send-btn');
+    const quickReplies = document.querySelectorAll('.quick-reply');
+    const typingIndicator = document.getElementById('typing-indicator');
+
+    function addMessage(message, isUser) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = isUser ? 'user-message message' : 'bot-message message';
+        messageDiv.textContent = message;
+        chatContainer.appendChild(messageDiv);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    function showTypingIndicator() {
+        typingIndicator.style.display = 'block';
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    function hideTypingIndicator() {
+        typingIndicator.style.display = 'none';
+    }
+
+    function sendMessage() {
+        const message = userInput.value.trim();
+        if (message) {
+            addMessage(message, true);
+            userInput.value = '';
+
+            showTypingIndicator();
+
+            fetch('/chatbot', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ message: message })
+            })
+            .then(response => response.json())
+            .then(data => {
+                hideTypingIndicator();
+                addMessage(data.botReply, false);
+            })
+            .catch(error => {
+                hideTypingIndicator();
+                console.error('Error:', error);
+                addMessage('Sorry, something went wrong. Please try again.', false);
+            });
+        }
+    }
+
+    sendBtn.addEventListener('click', sendMessage);
+
+    userInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') sendMessage();
+    });
+
+    quickReplies.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const reply = this.getAttribute('data-reply');
+            userInput.value = reply;
+            sendMessage();
+        });
+    });
+
+    setTimeout(() => {
+        addMessage("Welcome! You can share how you're feeling or ask for resources. I'm here to help.", false);
+    }, 1500);
+});
+</script>
+
+
+
+</body>
+
+</html>
